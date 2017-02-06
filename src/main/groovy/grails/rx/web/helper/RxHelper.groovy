@@ -3,13 +3,17 @@ package grails.rx.web.helper
 import grails.rx.web.Rx
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.SimpleType
 import io.reactivex.Emitter
 import io.reactivex.Observable
+import org.codehaus.groovy.runtime.GStringImpl
 import org.grails.plugins.rx.web.NewObservableResult
 import org.grails.plugins.rx.web.ObservableResult
 import org.grails.plugins.rx.web.StreamingNewObservableResult
 import org.grails.plugins.rx.web.StreamingObservableResult
 import org.grails.plugins.rx.web.result.RxResult
+import org.grails.plugins.rx.web.sse.SseResult
 import org.grails.web.converters.Converter
 
 import javax.servlet.http.HttpServletRequest
@@ -117,6 +121,46 @@ class RxHelper {
      */
     RxResult<Converter> render(Converter converter) {
         Rx.render(converter)
+    }
+
+    SseResult event(Map sseOptions, Writable writable) {
+        Rx.event(sseOptions, writable)
+    }
+
+    SseResult event(Writable writable) {
+        Rx.event([:], writable)
+    }
+
+    SseResult event(Map sseOptions, Converter converter) {
+        Rx.event(sseOptions, converter)
+    }
+
+    SseResult event(Converter writable) {
+        Rx.event([:], writable)
+    }
+
+    SseResult event(Map sseOptions, GStringImpl gString) {
+        Rx.event(sseOptions, gString)
+    }
+
+    SseResult event(GStringImpl gString) {
+        Rx.event([:], gString)
+    }
+
+    SseResult event(Map sseOptions, CharSequence charSequence) {
+        Rx.event(sseOptions, charSequence)
+    }
+
+    SseResult event(CharSequence charSequence) {
+        Rx.event([:], charSequence)
+    }
+
+    SseResult event(Map sseOptions, @ClosureParams(value = SimpleType, options = ['java.io.Writer']) Closure closure) {
+        Rx.event(sseOptions, closure)
+    }
+
+    SseResult event(@ClosureParams(value = SimpleType, options = ['java.io.Writer']) Closure closure) {
+        Rx.event([:], closure)
     }
 
     /**

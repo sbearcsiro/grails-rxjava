@@ -15,6 +15,14 @@ function tickTock() {
         document.getElementById('message').innerHTML = event.data;
     };
 
+    var handler = function(event) {
+        console.log("data: "+event.data)
+        document.getElementById('events').innerHTML = event.data.replace("\n", "<br>");
+    };
+    var events = new EventSource("tickTock/sse");
+    events.addEventListener('tick', handler);
+    events.addEventListener('tock', handler);
+
 }
 tickTock()
     </script>
@@ -68,6 +76,7 @@ tickTock()
         <section class="row colset-2-its">
             <h1>Welcome to Grails</h1>
             <h2 style="text-align:center;font-size:50px" id="message"></h2>
+            <h2 style="text-align:center;font-size:50px" id="events"></h2>
             <p>
                 Congratulations, you have successfully started your first Grails application! At the moment
                 this is the default page, feel free to modify it to either redirect to a controller or display

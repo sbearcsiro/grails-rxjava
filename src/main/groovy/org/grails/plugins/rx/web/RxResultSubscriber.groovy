@@ -13,6 +13,7 @@ import io.reactivex.disposables.Disposable
 import org.grails.plugins.rx.web.result.ForwardResult
 import org.grails.plugins.rx.web.result.RxCompletionStrategy
 import org.grails.plugins.rx.web.result.RxResult
+import org.grails.plugins.rx.web.sse.SseResult
 import org.grails.plugins.web.async.GrailsAsyncContext
 import org.grails.web.errors.GrailsExceptionResolver
 import org.grails.web.servlet.mvc.GrailsWebRequest
@@ -165,6 +166,17 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
             }
         }
+        else if (o instanceof SseResult) {
+            SseResult sseResult = (SseResult) o
+            def response = asyncContext.response
+            def writer = response.writer
+            if (!sseResult.event && serverSendEventName) {
+                sseResult.event = serverSendEventName
+            }
+            sseResult.writeTo(writer)
+            completionStrategy = RxCompletionStrategy.COMPLETE
+            response.flushBuffer()
+        }
         else if(o instanceof HttpStatus) {
             // if the item emitted is an HttpStatus object set the status
             // of the response and terminate proccessing
@@ -212,6 +224,7 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
     @Override
     void onComplete() {
+        log.error("Observer.onComplete")
         synchronized (asyncContext) {
             // When the observable finishes emitting items
             // terminate the asynchronous context in the appropriate manner based on the
@@ -238,6 +251,7 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
     @Override
     void onError(Throwable e) {
+        log.error("Observer.onError")
         synchronized (asyncContext) {
             if(!asyncComplete && !asyncContext.response.isCommitted()) {
                 // if an error occurred and the response has not yet been commited try and handle it
@@ -269,6 +283,7 @@ class RxResultSubscriber implements AsyncListener, Observer {
                 asyncContext.complete()
             }
         }
+        log.error("Observer.onError complete")
     }
 
     @Override
@@ -284,6 +299,7 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
     @Override
     void onTimeout(AsyncEvent event) throws IOException {
+        log.error("AsyncListener.onTimeout")
         synchronized (asyncContext) {
             if( disposable != null && !disposable.isDisposed() ) {
                 disposable.dispose()
@@ -291,10 +307,12 @@ class RxResultSubscriber implements AsyncListener, Observer {
                 asyncComplete = true
             }
         }
+        log.error("AsyncListener.onTimeout complete")
     }
 
     @Override
     void onError(AsyncEvent event) throws IOException {
+        log.error("AsyncListener.onError")
         synchronized (asyncContext) {
             if( disposable != null && !disposable.isDisposed() ) {
                 disposable.dispose()
@@ -302,6 +320,7 @@ class RxResultSubscriber implements AsyncListener, Observer {
                 asyncComplete = true
             }
         }
+        log.error("AsyncListener.onError complete")
     }
 
     @Override
