@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 import io.reactivex.ObservableOnSubscribe
+import io.reactivex.schedulers.Schedulers
 import org.grails.plugins.web.async.GrailsAsyncContext
 import org.grails.web.errors.GrailsExceptionResolver
 import org.grails.web.servlet.mvc.ActionResultTransformer
@@ -122,20 +123,15 @@ class RxResultTransformer implements ActionResultTransformer {
                 }
             }
             else {
-                NewObservableResult newObservableResult = (NewObservableResult)actionResult
-                Observable newObservable = Observable.create( { ObservableEmitter newSub ->
-                    asyncContext.start {
-                        try {
-                            Closure callable = newObservableResult.callable
-                            callable.setDelegate(newSub)
-                            callable.call(newSub)
-                        } catch (e) {
-                            newSub.onError(e)
-                            throw e
-                        }
-                    }
-                } as ObservableOnSubscribe)
-                newObservable.subscribe(subscriber)
+                asyncContext.start {
+                    NewObservableResult newObservableResult = (NewObservableResult)actionResult
+                    Observable newObservable = Observable.create( { ObservableEmitter newSub ->
+                        Closure callable = newObservableResult.callable
+                        callable.setDelegate(newSub)
+                        callable.call(newSub)
+                    } as ObservableOnSubscribe)
+                    newObservable.subscribe(subscriber)
+                }
             }
             // return null indicating that the request thread should be returned to the thread pool
             // async request processing will take over

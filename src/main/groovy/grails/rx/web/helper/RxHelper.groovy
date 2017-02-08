@@ -123,42 +123,144 @@ class RxHelper {
         Rx.render(converter)
     }
 
+    /**
+     * Create a Server Sent Event without data
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @return The SSE Event
+     */
+    SseResult event(Map sseOptions) {
+        Rx.event(sseOptions, (Writable) null)
+    }
+
+    /**
+     * Use a writable to create a Server Sent Event
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @param writable The writable
+     * @return The SSE Event
+     */
     SseResult event(Map sseOptions, Writable writable) {
         Rx.event(sseOptions, writable)
     }
 
+    /**
+     * Use a writable to create a Server Sent Event
+     *
+     * @param writable The writable
+     * @return The SSE Event
+     */
     SseResult event(Writable writable) {
         Rx.event([:], writable)
     }
 
+    /**
+     * Use a converter to create a Server Sent Event
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @param converter The converter
+     * @return The SSE Event
+     */
     SseResult event(Map sseOptions, Converter converter) {
         Rx.event(sseOptions, converter)
     }
 
+    /**
+     * Use a converter to create a Server Sent Event
+     *
+     * @param converter The converter
+     * @return The SSE Event
+     */
     SseResult event(Converter writable) {
         Rx.event([:], writable)
     }
 
+    /**
+     * Use a GString to create a Server Sent Event
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @param gString The GString
+     * @return The SSE Event
+     */
+    // required for GStrings in @CompileStatic, @TypeChecked otherwise compiler can't decide between Writable or CharSequence method
+    SseResult event(Map sseOptions, GString gString) {
+        Rx.event(sseOptions, (Writable)gString)
+    }
+
+    /**
+     * Use a GString to create a Server Sent Event
+     *
+     * @param gString The GString
+     * @return The SSE Event
+     */
+    // required for GStrings in @CompileStatic, @TypeChecked otherwise compiler can't decide between Writable or CharSequence method
+    SseResult event(GString gString) {
+        Rx.event([:], (Writable)gString)
+    }
+
+    /**
+     * Use a GString to create a Server Sent Event
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @param gString The GString
+     * @return The SSE Event
+     */
+    // required for GStrings in @CompileDynamic, @TypeChecked otherwise runtime can't decide between Writable or CharSequence method
     SseResult event(Map sseOptions, GStringImpl gString) {
-        Rx.event(sseOptions, gString)
+        Rx.event(sseOptions, (Writable)gString)
     }
 
+    /**
+     * Use a GString to create a Server Sent Event
+     *
+     * @param gString The GString
+     * @return The SSE Event
+     */
+    // required for GStrings in @CompileDynamic, @TypeChecked otherwise runtime can't decide between Writable or CharSequence method
     SseResult event(GStringImpl gString) {
-        Rx.event([:], gString)
+        Rx.event([:], (Writable)gString)
     }
 
+    /**
+     * Use a CharSequence to create a Server Sent Event
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @param charSequence The CharSequence
+     * @return The SSE Event
+     */
     SseResult event(Map sseOptions, CharSequence charSequence) {
         Rx.event(sseOptions, charSequence)
     }
 
+    /**
+     * Use a CharSequence to create a Server Sent Event
+     *
+     * @param charSequence The CharSequence
+     * @return The SSE Event
+     */
     SseResult event(CharSequence charSequence) {
         Rx.event([:], charSequence)
     }
 
+    /**
+     * Use a Closure to create a Server Sent Event.  The closure will be passed a {@link Writer} as the only argument
+     * which it can use to write the data for the event to.
+     *
+     * @param sseOptions optional Server Sent Event arguments (comment, id, event, retry)
+     * @param closure The closure
+     * @return The SSE Event
+     */
     SseResult event(Map sseOptions, @ClosureParams(value = SimpleType, options = ['java.io.Writer']) Closure closure) {
         Rx.event(sseOptions, closure)
     }
 
+    /**
+     * Use a Closure to create a Server Sent Event.  The closure will be passed a {@link Writer} as the only argument
+     * which it can use to write the data for the event to.
+     *
+     * @param closure The closure
+     * @return The SSE Event
+     */
     SseResult event(@ClosureParams(value = SimpleType, options = ['java.io.Writer']) Closure closure) {
         Rx.event([:], closure)
     }

@@ -49,6 +49,8 @@ dependencies {
 //    compile "org.grails.plugins:rxjava:2.0.0.BUILD-SNAPSHOT"
     compile project(":rxjava")
 
+    compile 'org.grails.plugins:quartz:2.0.9'
+
     console "org.grails:grails-console"
     profile "org.grails.profiles:web"
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.11.6"

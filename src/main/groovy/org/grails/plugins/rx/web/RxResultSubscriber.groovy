@@ -224,7 +224,6 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
     @Override
     void onComplete() {
-        log.error("Observer.onComplete")
         synchronized (asyncContext) {
             // When the observable finishes emitting items
             // terminate the asynchronous context in the appropriate manner based on the
@@ -251,7 +250,6 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
     @Override
     void onError(Throwable e) {
-        log.error("Observer.onError")
         synchronized (asyncContext) {
             if(!asyncComplete && !asyncContext.response.isCommitted()) {
                 // if an error occurred and the response has not yet been commited try and handle it
@@ -283,7 +281,6 @@ class RxResultSubscriber implements AsyncListener, Observer {
                 asyncContext.complete()
             }
         }
-        log.error("Observer.onError complete")
     }
 
     @Override
@@ -299,7 +296,6 @@ class RxResultSubscriber implements AsyncListener, Observer {
 
     @Override
     void onTimeout(AsyncEvent event) throws IOException {
-        log.error("AsyncListener.onTimeout")
         synchronized (asyncContext) {
             if( disposable != null && !disposable.isDisposed() ) {
                 disposable.dispose()
@@ -307,12 +303,10 @@ class RxResultSubscriber implements AsyncListener, Observer {
                 asyncComplete = true
             }
         }
-        log.error("AsyncListener.onTimeout complete")
     }
 
     @Override
     void onError(AsyncEvent event) throws IOException {
-        log.error("AsyncListener.onError")
         synchronized (asyncContext) {
             if( disposable != null && !disposable.isDisposed() ) {
                 disposable.dispose()
@@ -320,7 +314,6 @@ class RxResultSubscriber implements AsyncListener, Observer {
                 asyncComplete = true
             }
         }
-        log.error("AsyncListener.onError complete")
     }
 
     @Override

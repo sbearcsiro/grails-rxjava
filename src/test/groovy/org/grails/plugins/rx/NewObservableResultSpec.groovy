@@ -15,6 +15,8 @@ import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.GrailsApplicationAttributes
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.async.WebAsyncManager
+import org.springframework.web.context.request.async.WebAsyncUtils
 import spock.lang.Specification
 import static grails.rx.web.Rx.*
 /**
@@ -116,6 +118,37 @@ data: {"foo":"bar 3"}
         cleanup:
         RequestContextHolder.setRequestAttributes(null)
     }
+
+    void "test exception is handled and async connection is complete"() {
+        setup:
+        GrailsWebRequest webRequest = GrailsWebMockUtil.bindMockWebRequest()
+        MockHttpServletRequest request = webRequest.getCurrentRequest()
+        request.setAsyncSupported(true)
+        NewObservableController controller = new NewObservableController()
+        request.setAttribute(GrailsApplicationAttributes.CONTROLLER, controller)
+        WebAsyncManager webAsyncManager = WebAsyncUtils.getAsyncManager(webRequest.currentRequest)
+
+        when:"An action is rendered that creates an observable"
+        def observable = controller.streamException()
+
+        then:"The result is correct"
+        observable instanceof StreamingNewObservableResult
+
+        when:"The observable is transformed"
+        RxResultTransformer transformer = new RxResultTransformer()
+        def result = transformer.transformActionResult(webRequest, "stream", observable)
+        then:"null is returned"
+        result == null
+        webRequest.response.contentType == RxResultTransformer.CONTENT_TYPE_EVENT_STREAM
+        webRequest.response.committed == true
+        webRequest.response.contentAsString == ''''''
+
+        then:"The async request is complete"
+        webAsyncManager?.asyncWebRequest?.isAsyncComplete() == true
+
+        cleanup:
+        RequestContextHolder.setRequestAttributes(null)
+    }
 }
 class NewObservableController implements Controller, RestResponder{
     def index() {
@@ -148,6 +181,12 @@ class NewObservableController implements Controller, RestResponder{
                 )
             }
             subscriber.onComplete()
+        }
+    }
+
+    def streamException() {
+        stream { Emitter emitter ->
+            throw new RuntimeException("Expected", null, true, false) {}
         }
     }
 }
